@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.processing {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background-color: #8080807d;
+}
+
+.white {
+    color:white;
+}
+
+.img-size {
+    height: 200px;
+}
+
+body {
+    background-image: url("imgs/background.png") !important;
+    background-size: cover;
+}
+
+* {    
+    color: white;
+}
+
+.auto-align {
+    margin-top: auto !important;
+    margin-bottom: auto;
+}
+
+.potion-size {
+    width: 125px !important;
+}
+
+.center {
+    text-align: center;
+}
+
+.margin-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.thick-text {
+    font-weight: 900;
+}
+
+.small-text {
+    font-size: 12px;
+}

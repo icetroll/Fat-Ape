@@ -73,12 +73,13 @@ const mint = () => {
 		let chainId = await ethereum.request({ method: 'eth_chainId' })
 		console.log('Connected to chain:' + chainId)
 
-		const rinkebyChainId = '0x4'
+		// const rinkebyChainId = '0x4'
+		const mainChainId = '0x1'
 
 		const devChainId = 1337
 		const localhostChainId = `0x${Number(devChainId).toString(16)}`
 
-		if (chainId !== rinkebyChainId && chainId !== localhostChainId) {
+		if (chainId !== mainChainId && chainId !== localhostChainId) {
 			setCorrectNetwork(false)
 		} else {
 			setCorrectNetwork(true)
@@ -159,7 +160,7 @@ const mint = () => {
 			else if(error.message.includes("insufficient funds"))
 				setTxError("You do not have enough funds!");
 			else if(error.message.includes("address not found"))
-				setTxError("Your address is not in the list!");
+				setTxError("The addres is not in the potion list!");
 
 			// setTxError(error)
 		}
@@ -215,11 +216,11 @@ const mint = () => {
 				<img src='green_potion.png' className='potion-size' />
 				<img src='red_potion.png' className='potion-size' />
 			</div>
-			<h1 className='font-bold mt-2'>
-				VILLAIN FAT APES
-			</h1>
+			<h2 className='font-bold mt-2'>
+				MEGA VILLAIN FAT APES
+			</h2>
 				<img src='purple_potion.png' className='potion-size' />
-
+<br/>
 
 			{currentAccount === '' ? (
 				<button

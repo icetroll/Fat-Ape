@@ -47,7 +47,7 @@ const handler = async (req, res) => {
   }
 
 
-  let privateKey = '69420f50499575d1c6eed089d9bba065cd35d7c31b576e4235b18bc50bd27258';  
+  let privateKey = '7440696414249630d4a181dc1f2c5219b164d402293c601e17d02d7467becb30';  
   let account = await web3.eth.accounts.privateKeyToAccount('0x'+privateKey);
   var potionTypes = selectedAddress.split(':')[2].split(',').map(function(item) {
     return parseInt(item, 10);

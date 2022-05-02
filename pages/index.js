@@ -143,7 +143,7 @@ const mint = () => {
 				let tokenId = value.toNumber()
 
 				console.log(
-					`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTx.hash}`
+					`Mined, see transaction: https://etherscan.io/tx/${nftTx.hash}`
 				)
 
 				getMintedNFT(tokenId)

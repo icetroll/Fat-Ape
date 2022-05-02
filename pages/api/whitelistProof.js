@@ -12,7 +12,7 @@ const run = (req, res) => (fn) => new Promise((resolve, reject) => {
 const keccak256 = require('keccak256');
 const Web3 = require('web3');
 var web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/a533a7b72c804eb7a6d8b6239cd2ddfe'));
-let whitelist = require('../../utils/whitelist.json');
+const whitelist = require('../../utils/whitelist.json');
 // const hashedAddresses = whitelist.map(addr => keccak256(addr));
 // const merkleTree = new MerkleTree(hashedAddresses, keccak256, { sortPairs: true });
 
@@ -40,13 +40,8 @@ const handler = async (req, res) => {
       return element
   })
   
-  if (selectedAddress) {
-    res.status(400).json({ msg: "address not found", addy: address, addy_match: selectedAddress });
-    return;
-  }
-
   if (!selectedAddress) {
-    res.status(400).json({ msg: "address not found", addy: address, addy_match: selectedAddress });
+    res.status(400).json({ msg: "address not found" });
     return;
   }
 

@@ -48,7 +48,7 @@ const mint = () => {
 			let chainId = await ethereum.request({ method: 'eth_chainId' })
 			console.log('Connected to chain:' + chainId)
 
-			const rinkebyChainId = '0x4'
+			const rinkebyChainId = '0x1'
 
 			const devChainId = 4
 			const localhostChainId = `0x${Number(devChainId).toString(16)}`

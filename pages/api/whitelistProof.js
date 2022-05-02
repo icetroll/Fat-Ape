@@ -39,9 +39,14 @@ const handler = async (req, res) => {
     if(element.split(':')[0] === address)
       return element
   })
+  
+  if (selectedAddress) {
+    res.status(400).json({ msg: "address not found", addy: address, addy_match: selectedAddress });
+    return;
+  }
 
   if (!selectedAddress) {
-    res.status(400).json({ msg: "address not found", addy: address , addy_match: selectedAddress, wl: whitelist });
+    res.status(400).json({ msg: "address not found", addy: address, addy_match: selectedAddress });
     return;
   }
 

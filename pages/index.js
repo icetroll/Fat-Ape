@@ -191,7 +191,6 @@ const mint = () => {
 			}
 		} catch (error) {
 			console.log(error)
-			setTxError(error.message)
 		}
 	}
 
@@ -299,13 +298,8 @@ const mint = () => {
 			) : (
 				<div className='flex flex-col justify-center items-center'>
 					<div className='font-semibold text-lg text-center mb-4'>
-						Your Eternal Domain Character
+						You have now claimed your potions
 					</div>
-					<img
-						src={mintedNFT}
-						alt=''
-						className='h-60 w-60 rounded-lg shadow-2xl shadow-[#6FFFE9] hover:scale-105 transition duration-500 ease-in-out'
-					/>
 				</div>
 			)}
 				</div>

@@ -1,7 +1,4 @@
 import cors from 'cors';
-import cache from 'express-redis-cache';
-
-const c = cache();
 
 const run = (req, res) => (fn) => new Promise((resolve, reject) => {
   fn(req, res, (result) =>
@@ -20,7 +17,6 @@ const whitelist = require('../../utils/whitelist.json');
 const handler = async (req, res) => {
   const middleware = run(req, res);
   await middleware(cors());
-  await middleware(c.route());
 
   /** validate req type **/
   if (req.method !== 'GET') {

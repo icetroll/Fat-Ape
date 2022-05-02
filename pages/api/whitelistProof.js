@@ -11,8 +11,8 @@ const run = (req, res) => (fn) => new Promise((resolve, reject) => {
 
 const keccak256 = require('keccak256');
 const Web3 = require('web3');
-var web3 = new Web3(new Web3.providers.HttpProvider('https://rinkeby.infura.io/v3/a533a7b72c804eb7a6d8b6239cd2ddfe'));
-let whitelist = require('../../utils/whitelist.json');
+var web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/a533a7b72c804eb7a6d8b6239cd2ddfe'));
+let whitelist = require('./whitelist.json');
 // const hashedAddresses = whitelist.map(addr => keccak256(addr));
 // const merkleTree = new MerkleTree(hashedAddresses, keccak256, { sortPairs: true });
 

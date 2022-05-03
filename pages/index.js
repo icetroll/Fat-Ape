@@ -232,8 +232,7 @@ const mint = () => {
 				<div>
 					<button
 						className='flex flex-col justify-center items-center margin-auto thick-text mb-0 font-bold py-1 px-12 bg-white text-black shadow-lg shadow-[#6FFFE9] rounded-lg mb-10 hover:scale-105 transition duration-500 ease-in-out'
-						onClick={mintCharacter}
-						disabled
+						onClick={mintCharacter}						
 					>
 						MINT MY POTION
 					</button>

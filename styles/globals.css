@@ -25,7 +25,7 @@ body {
 }
 
 * {    
-    color: white;
+    /* color: white; */
 }
 
 .auto-align {
@@ -52,4 +52,16 @@ body {
 
 .small-text {
     font-size: 12px;
+}
+
+.white{
+    color: white;
+}
+
+.-cbwsdk-css-reset .-cbwsdk-extension-dialog-box-top-description-text{
+    color:white !important;
+}
+
+.black {
+    color: black;
 }

@@ -1,13 +1,32 @@
 import Head from 'next/head'
-
+import { InjectedConnector } from "@web3-react/injected-connector";
 import { useState, useEffect } from 'react'
 import { nftContractAddress } from '../config.js'
 import { ethers } from 'ethers'
 import axios from 'axios'
 
 import Loader from 'react-loader-spinner'
+import {
+	VStack,
+	useDisclosure,
+	Button,
+	Text,
+	HStack,
+	Select,
+	Input,
+	Box
+  } from "@chakra-ui/react";
+
+  import { ChakraProvider } from "@chakra-ui/react";
+  import { Web3ReactProvider } from "@web3-react/core";
+  import { networkParams } from "./networks";
+import { connectors } from "./connectors";
+import SelectWalletModal from "./Modal";
+import { useWeb3React } from "@web3-react/core";
 
 import NFT from '../utils/abi.json'
+
+
 
 const mint = () => {
 	const [mintedNFT, setMintedNFT] = useState(null)
@@ -16,6 +35,36 @@ const mint = () => {
 	const [txError, setTxError] = useState('')
 	const [currentAccount, setCurrentAccount] = useState('')
 	const [correctNetwork, setCorrectNetwork] = useState(false)
+	const [network, setNetwork] = useState(undefined);
+	const [error, setError] = useState("");
+
+	const { isOpen, onOpen, onClose } = useDisclosure();
+
+	
+	const {
+		library,
+		chainId,
+		account,
+		activate,
+		deactivate,
+		active
+	  } = useWeb3React();
+
+	  
+  const handleNetwork = (e) => {
+    const id = e.target.value;
+    setNetwork(Number(id));
+  };
+
+  const refreshState = () => {
+    window.localStorage.setItem("provider", undefined);
+    setNetwork("");
+  };
+
+  const disconnect = () => {
+    refreshState();
+    deactivate();
+  };
 
 	// Checks if wallet is connected
 	const checkIfWalletIsConnected = async () => {
@@ -67,34 +116,62 @@ const mint = () => {
 		}
 	}
 
+	const switchNetwork = async () => {
+		try {
+		  await library.provider.request({
+			method: "wallet_switchEthereumChain",
+			params: [{ chainId: toHex(1) }]
+		  });
+		} catch (switchError) {
+		  if (switchError.code === 4902) {
+			try {
+			  await library.provider.request({
+				method: "wallet_addEthereumChain",
+				params: [networkParams[toHex(1)]]
+			  });
+			} catch (error) {
+			  setError(error);
+			}
+		  }
+		}
+	  };
+
 	// Checks if wallet is connected to the correct network
 	const checkCorrectNetwork = async () => {
-		const { ethereum } = window
-		let chainId = await ethereum.request({ method: 'eth_chainId' })
-		console.log('Connected to chain:' + chainId)
+		console.log(chainId);
+		// const { ethereum } = window
+		// let chainId = await ethereum.request({ method: 'eth_chainId' })
+		// console.log('Connected to chain:' + chainId)
 
-		// const rinkebyChainId = '0x4'
-		const mainChainId = '0x1'
+		// // const rinkebyChainId = '0x4'
+		// const mainChainId = '0x1'
 
-		const devChainId = 1337
-		const localhostChainId = `0x${Number(devChainId).toString(16)}`
+		// const devChainId = 1337
+		// const localhostChainId = `0x${Number(devChainId).toString(16)}`
 
-		if (chainId !== mainChainId && chainId !== localhostChainId) {
-			setCorrectNetwork(false)
-		} else {
-			setCorrectNetwork(true)
-		}
+		// if (chainId !== mainChainId && chainId !== localhostChainId) {
+		// 	setCorrectNetwork(false)
+		// } else {
+		// 	setCorrectNetwork(true)
+		// }
 	}
 
 	useEffect(() => {
-		checkIfWalletIsConnected()
-		checkCorrectNetwork()
+		
+		// checkIfWalletIsConnected()
+		// checkCorrectNetwork()
+		const provider = window.localStorage.getItem("provider");
+		if (provider)
+			activate(connectors[provider]);
 	}, [])
 
 	// Creates transaction to mint NFT on clicking Mint Character button
 	const mintCharacter = async () => {
 		try {
 			const { ethereum } = window
+			
+			if(chainId != 1)
+				await switchNetwork();
 
 			if (ethereum) {
 				const provider = new ethers.providers.Web3Provider(ethereum)
@@ -108,7 +185,7 @@ const mint = () => {
 				let amount = 0;
 				let potionTypes = [];
 				
-					await fetch("api/whitelistProof?address=" + currentAccount)
+					await fetch("api/whitelistProof?address=" + account)
 					.then(res => res.json())
 					.then(
 						(result) => {
@@ -160,7 +237,7 @@ const mint = () => {
 			else if(error.message.includes("insufficient funds"))
 				setTxError("You do not have enough funds!");
 			else if(error.message.includes("address not found"))
-				setTxError("The addres is not in the potion list!");
+				setTxError("The addres is not in the potion list! " + account);
 
 			// setTxError(error)
 		}
@@ -195,139 +272,136 @@ const mint = () => {
 	}
 
 	return (
-		// <div className='flex flex-col items-center pt-32 bg-[#0B132B] text-[#d3d3d3] min-h-screen'>
-		<div class='container'>
-			
-			<Head>
-				<title>Fat Ape Potion</title>
-				<meta name='viewport' content='initial-scale=1.0, width=device-width' />
-			</Head>
-			<div class="row">
-				<div className='col-lg-8 col-sm-12 d-none d-lg-block d-xl-block'>
-					<img src='human.png' />
-				</div>
-			<div className='auto-align col-lg-4 col-sm-12 flex flex-col items-center'>
-			<h1 className='font-bold mt-2'>
-				VILLAIN FAT APES
-			</h1>
-			<div class='row'>				
-				<img src='blue_potion.png' className='potion-size' />
-				<img src='green_potion.png' className='potion-size' />
-				<img src='red_potion.png' className='potion-size' />
-			</div>
-			<h2 className='font-bold mt-2'>
-				MEGA VILLAIN FAT APES
-			</h2>
-				<img src='purple_potion.png' className='potion-size' />
-<br/>
-
-			{currentAccount === '' ? (
-				<button
-					className='text-2xl font-bold py-3 px-12 bg-white text-black shadow-lg shadow-[#6FFFE9] rounded-lg mb-10 hover:scale-105 transition duration-500 ease-in-out'
-					onClick={connectWallet}
-				>
-					Connect Wallet
-				</button>
-			) : correctNetwork ? (
-				<div>
-					<button
-						className='flex flex-col justify-center items-center margin-auto thick-text mb-0 font-bold py-1 px-12 bg-white text-black shadow-lg shadow-[#6FFFE9] rounded-lg mb-10 hover:scale-105 transition duration-500 ease-in-out'
-						onClick={mintCharacter}						
-					>
-						MINT MY POTION
-					</button>
-					<p class='center small-text'>free + gas fee</p>
-					<div class='d-none d-sm-block'>
-					<br/>					
-					<p>If you listed your SFA Fraternity Alpha abova 0.4 ETH or not listed it on (date) you are selected to mint a free potion to merge your SFA into a Villan Fat Ape of a Mega Villan Fat Ape.</p>
-					<br/>					
-					<p>If you want to merge a Super Villan Fat Ape, you will need to have 2 Villain Fat Ape to combine them into a Super Villain Fat Ape. DAP COMING SOON</p>
-					</div>
-				</div>
-			) : (
-				<div className='flex flex-col justify-center items-center mb-20 font-bold text-2xl gap-y-3'>
-					<div>----------------------------------------</div>
-					<div>Please connect to the Mainnet</div>
-					<div>and reload the page</div>
-					<div>----------------------------------------</div>
-				</div>
-			)}
-			
-			{txError !== "" ? (
-						<div className='text-lg text-red-600 font-semibold'>{txError}</div>
-			): ( <div></div> )}
-			
-			{miningStatus === 1 ? (
-						<div className='flex flex-col justify-center items-center processing'>
-						<div className='text-lg font-bold white'>
-								Processing your transaction
-							</div>
-							<Loader
-								className='flex justify-center items-center pt-12'
-								type='TailSpin'
-								color='#d3d3d3'
-								height={40}
-								width={40}
-							/>
-						</div>					
-				) : (
-					<div></div>
-				)}
+		//</div><div className='flex flex-col items-center pt-32 bg-[#0B132B] text-[#d3d3d3] min-h-screen'>
+<div>
+				<div className='container'>
 					
-			{loadingState === 0 ? (
-				miningStatus === 0 ? (
-					txError === null ? (
-						<div className='flex flex-col justify-center items-center'>
-							<div className='text-lg font-bold'>
-								Processing your transaction
-							</div>
-							<Loader
-								className='flex justify-center items-center pt-12'
-								type='TailSpin'
-								color='#d3d3d3'
-								height={40}
-								width={40}
-							/>
+					<Head>
+						<title>Fat Ape Potion</title>
+						<meta name='viewport' content='initial-scale=1.0, width=device-width' />
+					</Head>
+					<div className="row">
+						<div className='col-lg-8 col-sm-12 d-none d-lg-block d-xl-block'>
+							<img src='human.png' />
 						</div>
-					) : (
-						<div className='text-lg text-red-600 font-semibold'>{txError}</div>
-					)
-				) : (
-					<div></div>
-				)
-			) : (
-				<div className='flex flex-col justify-center items-center'>
-					<div className='font-semibold text-lg text-center mb-4'>
-						You have now claimed your potions
+					<div className='auto-align col-lg-4 col-sm-12 flex flex-col items-center'>
+					<h1 className='font-bold white mt-2'>
+						VILLAIN FAT APES
+					</h1>
+					<div className='row'>				
+						<img src='blue_potion.png' className='potion-size' />
+						<img src='green_potion.png' className='potion-size' />
+						<img src='red_potion.png' className='potion-size' />
 					</div>
-				</div>
-			)}
-				</div>
-				<div className='col-lg-8 col-sm-12 d-block d-sm-none'>
-					<img src='human.png' />
-					<br/>					
-					<p>If you listed your SFA Fraternity Alpha abova 0.4 ETH or not listed it on (date) you are selected to mint a free potion to merge your SFA into a Villan Fat Ape of a Mega Villan Fat Ape.</p>
-					<br/>					
-					<p>If you want to merge a Super Villan Fat Ape, you will need to have 2 Villain Fat Ape to combine them into a Super Villain Fat Ape. DAP COMING SOON</p>
-				</div>
+					<h2 className='font-bold white mt-2'>
+						MEGA VILLAIN FAT APES
+					</h2>
+						<img src='purple_potion.png' className='potion-size' />
+		<br/>
 
-				<div className='col-lg-8 col-sm-12 d-none d-md-block d-lg-none'>
+					{account === undefined ? (
+						// <button
+						// 	className='text-2xl font-bold py-3 px-12 bg-white text-black shadow-lg shadow-[#6FFFE9] rounded-lg mb-10 hover:scale-105 transition duration-500 ease-in-out'
+						// 	onClick={connectWallet}
+						// >
+						// 	Connect Wallet
+						// </button>
+							<Button className='black' onClick={onOpen}>Connect Wallet</Button>
+					) : (
+						<div>
+							<button
+								className='flex flex-col justify-center items-center margin-auto thick-text mb-0 font-bold py-1 px-12 bg-white text-black shadow-lg shadow-[#6FFFE9] rounded-lg mb-10 hover:scale-105 transition duration-500 ease-in-out'
+								onClick={mintCharacter}						
+							>
+								MINT MY POTION
+							</button>
+							<p className='center small-text'>free + gas fee</p>
+							<div className='d-none d-sm-block'>
+							<br/>					
+							<p className='white'>If you listed your SFA Fraternity Alpha abova 0.4 ETH or not listed it on (date) you are selected to mint a free potion to merge your SFA into a Villan Fat Ape of a Mega Villan Fat Ape.</p>
+							<br/>					
+							<p className='white'>If you want to merge a Super Villan Fat Ape, you will need to have 2 Villain Fat Ape to combine them into a Super Villain Fat Ape. DAP COMING SOON</p>
+							</div>
+						</div>
+					)}
 					
-					<div class="row">
-					<div class='col-8'>
-						<img src='human.png' />
+					{txError !== "" ? (
+								<div className='text-lg text-red-600 font-semibold'>{txError}</div>
+					): ( <div></div> )}
+					
+					{miningStatus === 1 ? (
+								<div className='flex flex-col justify-center items-center processing'>
+								<div className='text-lg font-bold white'>
+										Processing your transaction
+									</div>
+									<Loader
+										className='flex justify-center items-center pt-12'
+										type='TailSpin'
+										color='#d3d3d3'
+										height={40}
+										width={40}
+									/>
+								</div>					
+						) : (
+							<div></div>
+						)}
+							
+					{loadingState === 0 ? (
+						miningStatus === 0 ? (
+							txError === null ? (
+								<div className='flex flex-col justify-center items-center'>
+									<div className='text-lg font-bold'>
+										Processing your transaction
+									</div>
+									<Loader
+										className='flex justify-center items-center pt-12'
+										type='TailSpin'
+										color='#d3d3d3'
+										height={40}
+										width={40}
+									/>
+								</div>
+							) : (
+								<div className='text-lg text-red-600 font-semibold'>{txError}</div>
+							)
+						) : (
+							<div></div>
+						)
+					) : (
+						<div className='flex flex-col justify-center items-center'>
+							<div className='font-semibold text-lg text-center mb-4'>
+								You have now claimed your potions
+							</div>
+						</div>
+					)}
+						</div>
+						<div className='col-lg-8 col-sm-12 d-block d-sm-none'>
+							<img src='human.png' />
+							<br/>					
+							<p className='white'>If you listed your SFA Fraternity Alpha abova 0.4 ETH or not listed it on (date) you are selected to mint a free potion to merge your SFA into a Villan Fat Ape of a Mega Villan Fat Ape.</p>
+							<br/>					
+							<p className='white'>If you want to merge a Super Villan Fat Ape, you will need to have 2 Villain Fat Ape to combine them into a Super Villain Fat Ape. DAP COMING SOON</p>
+						</div>
+
+						<div className='col-lg-8 col-sm-12 d-none d-md-block d-lg-none'>
+							
+							<div className="row">
+							<div className='col-8'>
+								<img src='human.png' />
+							</div>
+							<div className='col-4'>
+							<br/>					
+							<p className='white'>If you listed your SFA Fraternity Alpha abova 0.4 ETH or not listed it on (date) you are selected to mint a free potion to merge your SFA into a Villan Fat Ape of a Mega Villan Fat Ape.</p>
+							<br/>					
+							<p className='white'>If you want to merge a Super Villan Fat Ape, you will need to have 2 Villain Fat Ape to combine them into a Super Villain Fat Ape. DAP COMING SOON</p>
+							</div>
+							</div>
+						</div>
 					</div>
-					<div class='col-4'>
-					<br/>					
-					<p>If you listed your SFA Fraternity Alpha abova 0.4 ETH or not listed it on (date) you are selected to mint a free potion to merge your SFA into a Villan Fat Ape of a Mega Villan Fat Ape.</p>
-					<br/>					
-					<p>If you want to merge a Super Villan Fat Ape, you will need to have 2 Villain Fat Ape to combine them into a Super Villain Fat Ape. DAP COMING SOON</p>
-					</div>
-					</div>
+					
 				</div>
-			</div>
-			
-		</div>
+				<SelectWalletModal className='black' isOpen={isOpen} closeModal={onClose} />
+				</div>
 	)
 }
 

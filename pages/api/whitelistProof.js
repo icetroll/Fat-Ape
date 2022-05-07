@@ -32,7 +32,7 @@ const handler = async (req, res) => {
   }
 
   let selectedAddress = whitelist.find((element) => {
-    if(element.split(':')[0] === address)
+    if(element.split(':')[0].toLowerCase() === address.toLowerCase())
       return element
   })
   

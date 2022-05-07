@@ -22,3 +22,8 @@ export const connectors = {
   walletConnect: walletconnect,
   coinbaseWallet: walletlink
 };
+
+
+export default () => {
+    return "";
+    }

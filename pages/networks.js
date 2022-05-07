@@ -1,3 +1,8 @@
+
+export default () => {
+  return "";
+  }
+
 export const networkParams = {
     "0x63564c40": {
       chainId: "0x63564c40",
@@ -18,4 +23,3 @@ export const networkParams = {
       ]
     }
   };
-  

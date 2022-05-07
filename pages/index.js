@@ -21,7 +21,7 @@ import {
   import { Web3ReactProvider } from "@web3-react/core";
   import { networkParams } from "./networks";
 import { connectors } from "./connectors";
-import SelectWalletModal from "./Modal";
+import SelectWalletModal from "./modal";
 import { useWeb3React } from "@web3-react/core";
 
 import NFT from '../utils/abi.json'
